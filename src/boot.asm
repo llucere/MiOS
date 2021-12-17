@@ -15,44 +15,47 @@ pchar:
 	je .isBackspace
 	jmp .else1
 
+	;push cx
+	xor cx, cx
 	.isBackspace:
-		dec byte[cursor_position]
+		mov cx, cursor_position
+		dec cx
+		mov [cursor_position], cx
+
 		mov ah, 0x0e
 		call backspace
 		jmp .exit
-
 	.else1:
 		cmp al, 0xA
 		je .isEnter
 		cmp al, 0xD
 		je .isEnter
-
 		jmp .else2
 
 		.isEnter:
-		mov bx, new_line
-		call write
-		
+			mov bx, new_line
+			call write
+			.lp1:
+				call backspace
+				dec cx
 
-		mov bx, cursor_position
-		.lp1:
-			call backspace
-			dec bx
+				cmp cx, 0
+				jl .lp1
 
-			cmp bx, 0
-			jle .lp1
-
-		mov byte[cursor_position], 0
-		
-		jmp .exit
+			mov [cursor_position], cx
+			jmp .exit
 
 		.else2:
-		inc byte[cursor_position]
-		mov ah, 0x0e
-		int 0x10
-		jmp .exit
+			mov cx, cursor_position
+			inc cx
+			mov [cursor_position], cx
+
+			mov ah, 0x0e
+			int 0x10
+			jmp .exit
 
 	.exit:
+	;pop cx
 ret
 
 start:
