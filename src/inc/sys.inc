@@ -1,7 +1,5 @@
 [org 0x7c00]
 
-read:
-
 write:
 	mov ah, 0x0e ; turn on teletype mode
 	.lp:
